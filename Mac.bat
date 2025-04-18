@@ -4,9 +4,9 @@ setlocal enabledelayedexpansion
 :: Main Menu
 :mainMenu
 cls
-echo . this probaly fucks ur mac so be carefull
-echo . If is does fuck your mac not are fault
-echo . If your scared to fuck it use tmac 
+echo 0 . this probaly fucks ur mac so be carefull
+echo 0 . If is does fuck your mac not are fault
+echo 0 . If your scared to fuck it use tmac 
 echo 1. Spoof MAC (Intel)
 echo 2. Spoof MAC (AMD)
 echo 3. Restore Original MAC
