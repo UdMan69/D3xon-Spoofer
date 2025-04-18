@@ -4,15 +4,13 @@ setlocal enabledelayedexpansion
 :: Main Menu
 :mainMenu
 cls
-echo ================================
-echo       MAC Spoofer Menu
-echo ================================
+echo 0. this probaly fucks ur mac so be carefull
 echo 1. Spoof MAC (Intel)
 echo 2. Spoof MAC (AMD)
 echo 3. Restore Original MAC
 echo 4. Show MAC Address
 echo 5. Exit
-echo ================================
+echo 
 set /p choice=Select an option: 
 
 if "%choice%"=="1" goto spoofIntel
@@ -22,12 +20,12 @@ if "%choice%"=="4" goto showMAC
 if "%choice%"=="5" exit
 goto mainMenu
 
-:: ===== Intel Spoofing =====
+::  Intel Spoofing 
 :spoofIntel
 set "spoofType=Intel"
 goto spoof
 
-:: ===== AMD Spoofing =====
+:: AMD Spoofing 
 :spoofAMD
 set "spoofType=AMD"
 goto spoof
@@ -57,7 +55,7 @@ if not defined adapterName (
 :: === Store original MAC in variable ===
 set "originalMAC=!origMAC!"
 
-:: === OUIs ===
+:: OUIs
 if /i "%spoofType%"=="Intel" (
     set OUIs[0]=3C:FD:FE
     set OUIs[1]=00:1B:21
@@ -75,7 +73,7 @@ if /i "%spoofType%"=="Intel" (
 set /a pick=%random% %% 5
 call set "OUI=%%OUIs[%pick%]%%"
 
-:: === Generate last 3 bytes ===
+::  Generate last 3 bytes 
 set chars=0123456789ABCDEF
 set "randMAC="
 for /L %%i in (1,1,6) do (
@@ -83,13 +81,13 @@ for /L %%i in (1,1,6) do (
     set "randMAC=!randMAC!!chars:~!rand!,1!"
 )
 
-:: === Format full MAC ===
+::  Format full MAC 
 set "mac=%OUI%:%randMAC:~0,2%:%randMAC:~2,2%:%randMAC:~4,2%"
 set "formattedMAC=%mac::=-%"
 set "rawMAC=%mac::=%"
 echo [INFO] New MAC: %formattedMAC%
 
-:: === Locate Registry Key ===
+::  Locate Registry Key 
 set "regKey="
 for /f "tokens=*" %%A in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}" /s /f "DriverDesc" ^| findstr /i /c:"!adapterName!"') do (
     set "regKey=%%~dpA"
@@ -101,10 +99,10 @@ if not defined regKey (
 )
 set "regKey=!regKey:~0,-1!"
 
-:: === Write new MAC to registry ===
+:: Write new MAC to registry 
 reg add "!regKey!" /v "NetworkAddress" /d "!rawMAC!" /f >nul
 
-:: === Restart adapter with PowerShell ===
+::  Restart adapter with PowerShell
 echo [INFO] Restarting adapter "!adapterName!"...
 powershell -Command "Get-NetAdapter -Name '!adapterName!' | Disable-NetAdapter -Confirm:$false"
 timeout /t 3 >nul
@@ -118,7 +116,7 @@ goto mainMenu
 cls
 echo [INFO] Restoring original MAC...
 
-:: === Auto-detect adapter again ===
+:: Auto-detect adapter again 
 set "adapterName="
 for /f "skip=1 tokens=1 delims=," %%A in ('"getmac /v /fo csv"') do (
     set "adapterName=%%~A"
@@ -136,7 +134,7 @@ if not defined adapterName (
 
 echo [INFO] Restoring to original MAC: %originalMAC%
 
-:: === Locate Registry Key ===
+:: Locate Registry Key 
 set "regKey="
 for /f "tokens=*" %%A in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}" /s /f "DriverDesc" ^| findstr /i /c:"!adapterName!"') do (
     set "regKey=%%~dpA"
@@ -148,10 +146,10 @@ if not defined regKey (
 )
 set "regKey=!regKey:~0,-1!"
 
-:: === Restore original MAC ===
+::  Restore original MAC 
 reg add "!regKey!" /v "NetworkAddress" /d "%originalMAC%" /f >nul
 
-:: === Restart adapter ===
+::  Restart adapter 
 echo [INFO] Restarting adapter "!adapterName!"...
 powershell -Command "Get-NetAdapter -Name '!adapterName!' | Disable-NetAdapter -Confirm:$false"
 timeout /t 3 >nul
